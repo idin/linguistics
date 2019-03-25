@@ -4,6 +4,8 @@ from setuptools import setup, find_packages
 import os
 try:
 	import spacy
+	spacy.prefer_gpu()
+	
 	try:
 		nlp = spacy.load('en_core_web_sm')
 	except:

@@ -12,6 +12,7 @@ from abstract import Graph, NodeStyle
 import spacy
 import nltk
 
+spacy.prefer_gpu()
 nlp = spacy.load('en_core_web_sm')
 
 class Token(BasicToken):

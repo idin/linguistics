@@ -2,6 +2,7 @@ from .DocumentObject import DocumentObject
 from .BasicToken import BasicToken as Token
 from spacy import tokens
 
+
 class TokenSpan(DocumentObject):
 
 	def __str__(self):
