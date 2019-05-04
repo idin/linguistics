@@ -1,6 +1,4 @@
-
-
-
+from slytherin import trim
 
 class DocumentObject:
 	def __init__(self, obj, document):
@@ -10,6 +8,10 @@ class DocumentObject:
 		"""
 		self._obj = obj
 		self._document = document
+
+	@property
+	def nlp(self):
+		return self.document.nlp
 
 	@property
 	def document(self):
@@ -25,16 +27,14 @@ class DocumentObject:
 		return self._obj.__str__()
 
 	def graph_str(self):
-		return str(self)
+		return trim(string=str(self), max_length=50, cut_from='middle')
 
 	@property
 	def id(self):
 		return None
 
 	def __eq__(self, other):
-		return self.id==other.id
+		return self.id == other.id
 
 	def __ne__(self, other):
-		return self.id!=other.id
-
-
+		return self.id != other.id

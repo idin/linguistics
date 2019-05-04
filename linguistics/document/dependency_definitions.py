@@ -51,5 +51,6 @@ DEPENDENCY_DEFINITONS = {
 	'xcomp': 'open_clausal_complement',
 	'xsubj': 'controlling_subject',
 	'attr': 'attributive',
-	'relcl': 'relative_clause_modifier'
+	'relcl': 'relative_clause_modifier',
+	'intj': 'interjection'
 }

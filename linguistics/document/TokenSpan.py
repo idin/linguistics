@@ -1,5 +1,4 @@
 from .DocumentObject import DocumentObject
-from .BasicToken import BasicToken as Token
 from spacy import tokens
 
 
@@ -9,7 +8,7 @@ class TokenSpan(DocumentObject):
 		return ' '.join([str(x) for x in self.tokens])
 
 	def __repr__(self):
-		return ' '.join([x.__repr__() for x in self.tokens])
+		return str(self)
 
 	@property
 	def obj(self):
@@ -66,14 +65,14 @@ class TokenSpan(DocumentObject):
 	@property
 	def tokens(self):
 		"""
-		:rtype: list[Token]
+		:rtype: list[.Document.Token]
 		"""
 		return self.document.tokens[self.start:self.end]
 
 	@property
 	def last_token(self):
 		"""
-		:rtype: Token
+		:rtype: .Document.Token
 		"""
 		return self.tokens[-1]
 

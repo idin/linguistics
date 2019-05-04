@@ -147,5 +147,3 @@ class BasicToken(DocumentObject):
 		:rtype: EntityChunk
 		"""
 		return self._entity_chunk
-
-

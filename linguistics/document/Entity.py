@@ -2,6 +2,7 @@ from .TokenSpan import TokenSpan
 from .remove_list_duplicates import remove_list_duplicates
 from .EntityType import EntityType
 
+
 class Entity(TokenSpan):
 
 	def __init__(self, obj, document):
@@ -34,13 +35,15 @@ class Entity(TokenSpan):
 		"""
 		return remove_list_duplicates(self.parent_noun_chunks + self.child_noun_chunks)
 
-
 	@property
 	def id(self):
-		return (self.document.id, 'entity', self.start, self.end)
+		return self.document.id, 'entity', self.start, self.end
+
+	def __str__(self):
+		return f'{super().__str__()} ({self.entity_type})'
 
 	def graph_str(self):
-		return f"{self}\n({str(self.entity_type).replace('_', ' ')})"
+		return f"{self.name}\n({str(self.entity_type).replace('_', ' ')})"
 
 	@property
 	def entity_type(self):

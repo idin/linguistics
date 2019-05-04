@@ -22,7 +22,7 @@ def readme():
 
 setup(
 	name='linguistics',
-	version='1.6.1',
+	version='1.6.2',
 	license='MIT',
 
 	url='https://github.com/idin/linguistics',
@@ -43,7 +43,7 @@ setup(
 	],
 
 	packages=find_packages(exclude=["jupyter_tests", ".idea", ".git"]),
-	install_requires=['abstract', 'spacy', 'nltk'],
+	install_requires=['abstract', 'spacy', 'nltk', 'requests'],
 	python_requires='~=3.6',
 	zip_safe=False
 )

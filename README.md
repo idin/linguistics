@@ -12,7 +12,7 @@ Linguistics uses Abstract and Graphviz to visualize graphs of the document.
 
 ## Usage
 
-### Creating a Document
+### *Document*
 ```python
 from linguistics import Document
 

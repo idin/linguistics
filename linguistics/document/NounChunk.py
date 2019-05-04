@@ -2,6 +2,7 @@ from .TokenSpan import TokenSpan
 from .remove_list_duplicates import remove_list_duplicates
 from .Entity import Entity
 
+
 class NounChunk(TokenSpan):
 
 	def __init__(self, obj, document):
@@ -32,7 +33,7 @@ class NounChunk(TokenSpan):
 
 	@property
 	def id(self):
-		return (self.document.id, 'noun_chunk', self.start, self.end)
+		return self.document.id, 'noun_chunk', self.start, self.end
 
 	def graph_str(self):
 		if self.entities:

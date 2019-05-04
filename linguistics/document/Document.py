@@ -12,50 +12,78 @@ from abstract import Graph, NodeStyle
 import spacy
 import nltk
 
-spacy.prefer_gpu()
-nlp = spacy.load('en_core_web_sm')
 
 class Token(BasicToken):
+	def __init__(self, obj, document):
+		super().__init__(obj=obj, document=document)
+		self._parents = None
+		self._children = None
+
 	def __add__(self, other):
 		"""
 		:param Token or Document other: adding two tokens (or several tokens) creates a Document
 		:rtype: Document
 		"""
-		return Document(text=str(self).rstrip()+' '+str(other).lstrip())
+		return Document(text=str(self).rstrip()+' '+str(other).lstrip(), nlp=self.nlp)
 
 	@property
 	def parents(self):
 		"""
 		:rtype: list[Token]
 		"""
-		try:
-			return self._parents
-		except AttributeError:
+		if self._parents is None:
 			self._parents = [Token(obj=x, document=self.document) for x in self.token.ancestors]
-			return self._parents
+		return self._parents
 
 	@property
 	def children(self):
 		"""
 		:rtype: list[Token]
 		"""
-		try:
-			return self._children
-		except AttributeError:
+		if self._children is None:
 			self._children = [Token(obj=x, document=self.document) for x in self.token.children]
-			return self._children
-
+		return self._children
 
 
 class Document:
-	def __init__(self, text, id=0):
+	def __init__(self, text=None, nlp=None, id=0, _doc=None):
 		"""
 		:type text: str
 		"""
+		spacy.prefer_gpu()
 		if isinstance(text, list):
 			text = ' '.join([str(x) for x in text])
 		self._id = id
-		self._text = str(text)
+
+		if text is None and _doc is None:
+			raise ValueError('Either text or _doc should be given!')
+		elif text is None:
+			self._doc = _doc
+			self._text = _doc.text
+			self._nlp = nlp
+		elif _doc is None:
+			self._doc = None
+			self._text = str(text)
+			self._nlp = nlp or spacy.load('en_core_web_sm')
+		else:
+			raise ValueError('Either text or _doc should be None!')
+
+		self._doc = None
+		self._tokens = None
+		self._noun_chunks = None
+		self._entity_chunks = None
+		self._entities = None
+		self._sentences = None
+		self._sentences_method = None
+		self._entity_graph = None
+		self._syntax_graph = None
+
+	@property
+	def nlp(self):
+		"""
+		:rtype: spacy.tokens.doc.Doc or NoneType
+		"""
+		return self._nlp
 
 	@property
 	def text(self):
@@ -78,11 +106,9 @@ class Document:
 		"""
 		:rtype: tokens.Doc
 		"""
-		try:
-			return self._doc
-		except AttributeError:
-			self._doc = nlp(self._text)
-			return self._doc
+		if self._doc is None:
+			self._doc = self._nlp(self._text)
+		return self._doc
 
 	def __repr__(self):
 		return self.doc.__repr__()
@@ -91,8 +117,10 @@ class Document:
 		return self.doc.__str__()
 
 	def graph_str(self):
-		if len(str(self))>50:
-			return f'{self}'[0:50]+'...'
+		if len(str(self)) > 50:
+			return f'{self}'[0:47] + '...'
+		else:
+			return str(self)
 
 	@property
 	def sentences(self):
@@ -101,16 +129,9 @@ class Document:
 		uses spacy to split a Document class into a list of Sentence objects
 		:rtype: list[Sentence]
 		"""
-
-		try:
-			if self._sentences_method == 'spacy':
-				return self._sentences
-			else:
-				raise AttributeError
-		except AttributeError:
+		if self._sentences is None:
 			self._sentences = self.get_sentences(method='spacy', return_type='Sentence')
 		return self._sentences
-
 
 	def get_sentences(self, method='spacy', return_type='Sentence'):
 
@@ -119,7 +140,6 @@ class Document:
 		:param str return_type: if method is spacy, return_type can be str or Sentence
 		:rtype: list[str] or list[Sentence]
 		"""
-
 
 		return_type = return_type.lower()
 
@@ -138,7 +158,6 @@ class Document:
 		else:
 			raise ValueError(f'method:{method} is unknown!')
 
-
 		if return_type == 'str':
 			return [str(x) for x in self._sentences]
 
@@ -148,17 +167,13 @@ class Document:
 		else:
 			return self._sentences
 
-
 	@property
 	def tokens(self):
 
 		"""
 		:rtype: list[Token]
 		"""
-
-		try:
-			return self._tokens
-		except AttributeError:
+		if self._tokens is None:
 			self.tokenize()
 		return self._tokens
 
@@ -167,9 +182,7 @@ class Document:
 		"""
 		:rtype: list[Entity]
 		"""
-		try:
-			return self._entities
-		except AttributeError:
+		if self._entities is None:
 			self.tokenize()
 		return self._entities
 
@@ -178,9 +191,7 @@ class Document:
 		"""
 		:rtype: list[NounChunk]
 		"""
-		try:
-			return self._noun_chunks
-		except:
+		if self._noun_chunks is None:
 			self.tokenize()
 		return self._noun_chunks
 
@@ -189,9 +200,7 @@ class Document:
 		"""
 		:rtype: list[EntityChunk]
 		"""
-		try:
-			return self._entity_chunks
-		except AttributeError:
+		if self._entity_chunks is None:
 			self.tokenize()
 		return self._entity_chunks
 
@@ -200,126 +209,120 @@ class Document:
 		"""
 		:rtype: Graph
 		"""
-		try:
-			return self._entity_graph
-		except AttributeError:
-			graph = Graph(ordering=False)
+		sentence_style = NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+		noun_chunk_style = NodeStyle(
+			fill_colour='lightpink', text_colour='black', text_size=8,
+			shape='rect', style='"rounded, filled"'
+		)
+		entity_style = NodeStyle(fill_colour='gold3', text_colour='black')
+		entity_chunk_style = NodeStyle(fill_colour='gold', text_colour='black')
 
+		if self._entity_graph is None:
+			self._entity_graph = Graph(ordering=False)
 			# add sentences to the graph
-
-
-			if len(self.sentences)>1:
-				graph.add_node(
+			if len(self.sentences) > 1:
+				self._entity_graph.add_node(
 					name=str(self.id), label=f'{self.graph_str()}\n({len(self.sentences)} sentences)',
 					style=NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
 				)
 				for i, sentence in enumerate(self.sentences):
-					graph.add_node(
-						name=str(sentence.id), label=f'{sentence.graph_str()}\n(sentence {i})',
-						style=NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+					self._entity_graph.add_node(
+						name=str(sentence.id), label=f'{sentence.graph_str()}\n(sentence {i+1})',
+						style=sentence_style
 					)
-					graph.connect(start=str(self.id), end=str(sentence.id))
+					self._entity_graph.connect(start=str(self.id), end=str(sentence.id))
 			else:
 				for sentence in self.sentences:
-					graph.add_node(
+					self._entity_graph.add_node(
 						name=str(sentence.id), label=f'{sentence.graph_str()}\n(one sentence)',
-						style=NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+						style=sentence_style
 					)
 
 			# add tokens to the graph
 			for token in self.tokens:
-				graph.add_node(
+				self._entity_graph.add_node(
 					name=str(token.id), label=f'{token.graph_str()}',
 					style=NodeStyle(text_size=8, shape='rect', style='"rounded, filled"')
 				)
 
-
-
-
-
 			# add noun_chunks to the graph
 			for noun_chunk in self.noun_chunks:
-				graph.add_node(
+				self._entity_graph.add_node(
 					name=str(noun_chunk.id), label=f'{noun_chunk.graph_str()}',
-					style=NodeStyle(
-						fill_colour='lightpink', text_colour='black', text_size=8,
-						shape='rect', style='"rounded, filled"'
-					)
+					style=noun_chunk_style
 				)
 
 				# noun_chunk to its tokens
 				for token in noun_chunk.tokens:
-					graph.connect(start=str(token.noun_chunk.id), end=str(token.id))
+					self._entity_graph.connect(start=str(token.noun_chunk.id), end=str(token.id))
 
 			# connect tokens to sentences (only the ones that don't have a noun chunk parent)
 			for sentence in self.sentences:
 				noun_chunks_connected_to_this_sentence = []
 				for token in sentence.tokens:
 					if not token.noun_chunk:
-						graph.connect(start=str(sentence.id), end=str(token.id))
+						self._entity_graph.connect(start=str(sentence.id), end=str(token.id))
 					else:
 						noun_chunk = token.noun_chunk
 						if noun_chunk not in noun_chunks_connected_to_this_sentence:
-							graph.connect(start=str(sentence.id), end=str(noun_chunk.id))
+							self._entity_graph.connect(start=str(sentence.id), end=str(noun_chunk.id))
 							noun_chunks_connected_to_this_sentence.append(noun_chunk)
 
 			# add entities to the graph
 			for entity in self.entities:
-				graph.add_node(
+				self._entity_graph.add_node(
 					name=str(entity.id), label=f'{entity.graph_str()}',
-					style=NodeStyle(fill_colour='gold3', text_colour='black')
+					style=entity_style
 				)
 				# connect entity to its tokens
 				for token in entity.tokens:
-					graph.connect(start=str(token.id), end=str(entity.id))
+					self._entity_graph.connect(start=str(token.id), end=str(entity.id))
 
 			# add entity_chunks to the graph
 			for entity_chunk in self.entity_chunks:
-				graph.add_node(
+				self._entity_graph.add_node(
 					name=str(entity_chunk.id), label=f'{entity_chunk.graph_str()}',
-					style=NodeStyle(fill_colour='gold', text_colour='black')
+					style=entity_chunk_style
 				)
 
 				# connect entity_chunk to its entities
 				for entity in entity_chunk.entities:
-					graph.connect(start=str(entity.id), end=str(entity_chunk.id))
+					self._entity_graph.connect(start=str(entity.id), end=str(entity_chunk.id))
 
-			self._entity_graph = graph
-			return self._entity_graph
+		return self._entity_graph
 
 	@property
-	def graph(self):
+	def syntax_graph(self):
 		"""
 		:rtype: Graph
 		"""
-		try:
-			return self._graph
-		except AttributeError:
-			graph = Graph(ordering=False)
+		sentence_style = NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+		if self._syntax_graph is None:
+			self._syntax_graph = Graph(ordering=False)
 
 			# add sentences to the graph
 			for sentence in self.sentences:
-				graph.add_node(
-					name=str(sentence.id), label=f'{sentence.graph_str()}\n(sentence)',
-					style=NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+				self._syntax_graph.add_node(
+					name=str(sentence.id),
+					label=f'{sentence.graph_str()}\n(sentence)',
+					style=sentence_style
 				)
 
 			for token in self.tokens:
-				graph.add_node(name=str(token.id), label=token.graph_str())
+				self._syntax_graph.add_node(name=str(token.id), label=token.graph_str())
 
 			# connect tokens to sentences
 			for sentence in self.sentences:
 				for token in sentence.tokens:
 					# only connect root tokens (tokens without parents) to the sentence
 					if len(token.parents) < 1:
-						graph.connect(start=str(sentence.id), end=str(token.id))
+						self._syntax_graph.connect(start=str(sentence.id), end=str(token.id))
 
 			for token in self.tokens:
 				for child in token.children:
 					dependency_label = str(child.dependency).replace('_', '\n')
-					graph.connect(start=str(token.id), end=str(child.id), label=dependency_label)
-			self._graph = graph
-			return self._graph
+					self._syntax_graph.connect(start=str(token.id), end=str(child.id), label=dependency_label)
+		return self._syntax_graph
 
 	def __add__(self, other):
 		"""
@@ -333,11 +336,11 @@ class Document:
 		:param str chunk_type: can be one of entity_chunk, noun_chunk, or entity
 		:rtype: list[Token or EntityChunk or NounChunk or Entity]
 		"""
-		if chunk_type=='entity_chunk':
+		if chunk_type == 'entity_chunk':
 			chunks = [x for x in self.tokens if x.entity_chunk is None] + self.entity_chunks
-		elif chunk_type=='entity':
+		elif chunk_type == 'entity':
 			chunks = [x for x in self.tokens if x.entity is None] + self.entities
-		elif chunk_type=='noun_chunk':
+		elif chunk_type == 'noun_chunk':
 			chunks = [x for x in self.tokens if x.noun_chunk is None] + self.noun_chunks
 		else:
 			raise ValueError(f'chunk_type "{chunk_type}" is not acceptable!')
@@ -349,7 +352,7 @@ class Document:
 		:param str chunk_type: can be one of entity_chunk, noun_chunk, or entity
 		:rtype: str
 		"""
-		if entity_types=='all':
+		if entity_types == 'all':
 			pass
 		else:
 			entity_types = [EntityType(name=x) if not isinstance(x, EntityType) else x for x in entity_types]
@@ -357,22 +360,19 @@ class Document:
 		strings = []
 		for chunk in chunks:
 			string = str(chunk)
-			if 	(chunk_type=='entity_chunk' and isinstance(chunk, EntityChunk)) or \
-				(chunk_type=='noun_chunk' and isinstance(chunk, NounChunk)):
+			if (chunk_type == 'entity_chunk' and isinstance(chunk, EntityChunk)) or \
+				(chunk_type == 'noun_chunk' and isinstance(chunk, NounChunk)):
 				for entity_type in sorted(chunk.entity_types):
-					if entity_types=='all':
+					if entity_types == 'all':
 						string = f'<{entity_type.long_name.upper()}>'
 						break
 					elif entity_type in entity_types:
 						string = f'<{entity_type.long_name.upper()}>'
 						break
-			elif chunk_type=='entity' and isinstance(chunk, Entity):
-				if entity_types=='all':
+			elif chunk_type == 'entity' and isinstance(chunk, Entity):
+				if entity_types == 'all':
 					string = f'<{chunk.entity_type.long_name.upper()}>'
 				elif chunk.entity_type in entity_types:
 					string = f'<{chunk.entity_type.long_name.upper()}>'
 			strings.append(string)
 		return ' '.join(join_punctuation(seq=[str(x) for x in strings]))
-
-
-

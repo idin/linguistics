@@ -5,7 +5,6 @@ from .remove_list_duplicates import remove_list_duplicates
 from .join_punctuation import join_punctuation
 
 
-
 class EntityChunk(TokenSpan):
 	def __init__(self, entity):
 		"""
@@ -25,7 +24,6 @@ class EntityChunk(TokenSpan):
 		self._entities = remove_list_duplicates([token.entity for token in self.tokens if token.entity])
 		for token in self.tokens:
 			token._entity_chunk = self
-
 
 	@property
 	def entities(self):
@@ -53,7 +51,7 @@ class EntityChunk(TokenSpan):
 		"""
 		:rtype: tuple
 		"""
-		return (self.document.id, 'entity_chunk', self.start, self.end)
+		return self.document.id, 'entity_chunk', self.start, self.end
 
 	def __str__(self):
 		return ' '.join(join_punctuation(seq=[str(x) for x in self.tokens]))
@@ -87,6 +85,3 @@ class EntityChunk(TokenSpan):
 		:rtype: str
 		"""
 		return f"{self}\n({str(self.main_entity_type).replace('_', ' ')})"
-
-
-
