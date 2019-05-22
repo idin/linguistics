@@ -43,7 +43,7 @@ setup(
 	],
 
 	packages=find_packages(exclude=["jupyter_tests", ".idea", ".git"]),
-	install_requires=['abstract', 'spacy', 'nltk', 'requests'],
+	install_requires=['abstract', 'spacy', 'nltk', 'requests', 'repustate'],
 	python_requires='~=3.6',
 	zip_safe=False
 )
