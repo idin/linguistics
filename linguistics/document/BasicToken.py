@@ -3,6 +3,7 @@ from .dependency_definitions import DEPENDENCY_DEFINITONS
 from .part_of_speach_definitions import PART_OF_SPEACH
 from .EntityType import EntityType
 
+
 class BasicToken(DocumentObject):
 	def __init__(self, obj, document):
 		"""
@@ -24,6 +25,10 @@ class BasicToken(DocumentObject):
 		:rtype: int
 		"""
 		return self.token.i
+
+	@property
+	def character_range(self):
+		return self.token.idx, self.token.idx + len(self.token.text)
 
 	@property
 	def start(self):

@@ -21,10 +21,12 @@ ENTITY_TYPES_BY_SHORTNAME = OrderedDict([
 	('ORDINAL', ('"first", "second", etc', 'ordinal')),
 	('CARDINAL', ('Numerals that do not fall under another type', 'cardinal'))
 ])
+
 ENTITY_TYPES_BY_LONGNAME = OrderedDict()
 for shortname, definition_longname in ENTITY_TYPES_BY_SHORTNAME.items():
 	definition, longname = definition_longname
 	ENTITY_TYPES_BY_LONGNAME[longname] = (definition, shortname)
+
 
 class EntityType:
 	def __init__(self, name):
