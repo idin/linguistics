@@ -1,13 +1,13 @@
 from abstract import Graph
 from abstract import NodeStyle
 
-from .Token import Token
-from .Entity import Entity
-from .Sentence import Sentence
-from .Sentiment import Sentiment
+from .GoogleToken import GoogleToken
+from .GoogleEntity import GoogleEntity
+from .GoogleSentence import GoogleSentence
+from .GoogleSentiment import GoogleSentiment
 
 
-class Document:
+class GoogleDocument:
 	def __init__(self, text=None, cloud=None, id=0, _analysis=None):
 		"""
 		:param str or NoneType text: a text to be converted to a GoogleDocument
@@ -34,7 +34,7 @@ class Document:
 		self._tokens = None
 		self._entities = None
 		sentiment = self._dictionary.pop('document_sentiment')
-		self._sentiment = Sentiment(score=sentiment.pop('score'), magnitude=sentiment.pop('magnitude'))
+		self._sentiment = GoogleSentiment(score=sentiment.pop('score'), magnitude=sentiment.pop('magnitude'))
 		self._language = None
 		self._graph = None
 
@@ -66,17 +66,17 @@ class Document:
 	def tokenize(self):
 		self._text = self._get_from_dictionary('text')
 
-		self._sentences = [Sentence(x, document=self) for x in self._get_from_dictionary('sentences')]
+		self._sentences = [GoogleSentence(x, document=self) for x in self._get_from_dictionary('sentences')]
 		self._sentences.sort()
 		for index, sentence in enumerate(self._sentences):
 			sentence._index = index
 
-		self._tokens = [Token(x, document=self) for x in self._get_from_dictionary('tokens')]
+		self._tokens = [GoogleToken(x, document=self) for x in self._get_from_dictionary('tokens')]
 		self._tokens.sort()
 		for index, token in enumerate(self._tokens):
 			token._index = index
 
-		self._entities = [Entity(x, document=self) for x in self._get_from_dictionary('entities')]
+		self._entities = [GoogleEntity(x, document=self) for x in self._get_from_dictionary('entities')]
 		for index, entity in enumerate(self._entities):
 			entity._index = index
 
@@ -93,7 +93,7 @@ class Document:
 	@property
 	def sentences(self):
 		"""
-		:rtype: list[Sentence]
+		:rtype: list[GoogleSentence]
 		"""
 		if self._sentences is None:
 			self.tokenize()
@@ -102,7 +102,7 @@ class Document:
 	@property
 	def tokens(self):
 		"""
-		:rtype: list[Token]
+		:rtype: list[GoogleToken]
 		"""
 		if self._tokens is None:
 			self.tokenize()
@@ -111,7 +111,7 @@ class Document:
 	@property
 	def entities(self):
 		"""
-		:rtype: list[Entity]
+		:rtype: list[GoogleEntity]
 		"""
 		if self._entities is None:
 			self.tokenize()
@@ -120,7 +120,7 @@ class Document:
 	@property
 	def sentiment(self):
 		"""
-		:rtype: Sentiment
+		:rtype: GoogleSentiment
 		"""
 		if self._sentiment is None:
 			self.tokenize()
@@ -140,7 +140,7 @@ class Document:
 		"""
 		:rtype: Graph
 		"""
-		sentence_style = style=NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+		sentence_style = NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
 		entity_style = NodeStyle(fill_colour='gold3', text_colour='black')
 		mention_style = NodeStyle(fill_colour='gold', text_colour='black')
 

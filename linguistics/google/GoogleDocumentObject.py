@@ -1,6 +1,7 @@
 from slytherin import trim
 
-class DocumentObject:
+
+class GoogleDocumentObject:
 	def __init__(self, dictionary, document, begin, end):
 		"""
 		:param dict dictionary: any object from a document

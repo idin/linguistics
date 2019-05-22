@@ -1,9 +1,8 @@
-from .TokenSpan import TokenSpan
-from .Sentiment import Sentiment
-from slytherin import trim
+from .GoogleTokenSpan import GoogleTokenSpan
+from .GoogleSentiment import GoogleSentiment
 
 
-class Mention(TokenSpan):
+class GoogleMention(GoogleTokenSpan):
 	def __init__(self, dictionary, document, entity):
 		text = dictionary.pop('text')
 		content = text.pop('content')
@@ -17,7 +16,7 @@ class Mention(TokenSpan):
 	@property
 	def entity(self):
 		"""
-		:rtype: Entity
+		:rtype: GoogleEntity
 		"""
 		return self._entity
 
@@ -25,7 +24,7 @@ class Mention(TokenSpan):
 	def id(self):
 		return self.document.id, 'mention', self.entity._index, self._index
 
-class Entity:
+class GoogleEntity:
 	def __init__(self, dictionary, document):
 		self._dictionary = dictionary
 		self._document = document
@@ -35,9 +34,9 @@ class Entity:
 		self._wikipedia_url = self._metadata.pop('wikipedia_url', None)
 		self._salience = self._dictionary.pop('salience')
 		sentiment = self._dictionary.pop('sentiment')
-		self._sentiment = Sentiment(score=sentiment.pop('score'), magnitude=sentiment.pop('magnitude'))
+		self._sentiment = GoogleSentiment(score=sentiment.pop('score'), magnitude=sentiment.pop('magnitude'))
 		self._mentions = [
-			Mention(dictionary=mention, document=self.document, entity=self)
+			GoogleMention(dictionary=mention, document=self.document, entity=self)
 			for mention in self._dictionary.pop('mentions')
 		]
 		for index, mention in enumerate(self.mentions):
@@ -67,7 +66,7 @@ class Entity:
 	@property
 	def mentions(self):
 		"""
-		:rtype: list[Mention]
+		:rtype: list[GoogleMention]
 		"""
 		return self._mentions
 
@@ -93,7 +92,7 @@ class Entity:
 	@property
 	def sentiment(self):
 		"""
-		:rtype: Sentiment
+		:rtype: GoogleSentiment
 		"""
 		return self._sentiment
 

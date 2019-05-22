@@ -1,2 +1,3 @@
 from .analyze import analyze
-from .Cloud import Cloud
+from .GoogleCloud import GoogleCloud
+from .GoogleCloud import GoogleCloud as Cloud

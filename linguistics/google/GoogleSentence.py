@@ -1,8 +1,8 @@
-from .TokenSpan import TokenSpan
-from .Sentiment import Sentiment
+from .GoogleTokenSpan import GoogleTokenSpan
+from .GoogleSentiment import GoogleSentiment
 
 
-class Sentence(TokenSpan):
+class GoogleSentence(GoogleTokenSpan):
 	def __init__(self, dictionary, document):
 
 		text = dictionary.pop('text')
@@ -14,7 +14,7 @@ class Sentence(TokenSpan):
 
 		self._text = content
 		sentiment = self._dictionary.pop('sentiment')
-		self._sentiment = Sentiment(score=sentiment.pop('score'), magnitude=sentiment.pop('magnitude'))
+		self._sentiment = GoogleSentiment(score=sentiment.pop('score'), magnitude=sentiment.pop('magnitude'))
 		self._index = None
 
 	@property
@@ -28,7 +28,7 @@ class Sentence(TokenSpan):
 	@property
 	def sentiment(self):
 		"""
-		:rtype: Sentiment
+		:rtype: GoogleSentiment
 		"""
 		return self._sentiment
 

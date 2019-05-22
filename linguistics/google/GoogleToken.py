@@ -1,7 +1,7 @@
-from .DocumentObject import DocumentObject
+from .GoogleDocumentObject import GoogleDocumentObject
 
 
-class Token(DocumentObject):
+class GoogleToken(GoogleDocumentObject):
 	def __init__(self, dictionary, document):
 		text = dictionary.pop('text')
 		content = text.pop('content')

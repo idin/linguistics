@@ -1,8 +1,8 @@
-from .DocumentObject import DocumentObject
-from .Token import Token
+from .GoogleDocumentObject import GoogleDocumentObject
+from .GoogleToken import GoogleToken
 
 
-class TokenSpan(DocumentObject):
+class GoogleTokenSpan(GoogleDocumentObject):
 	def __init__(self, dictionary, document, begin, end):
 		super().__init__(dictionary=dictionary, document=document, begin=begin, end=end)
 		self._tokens = None
@@ -16,7 +16,7 @@ class TokenSpan(DocumentObject):
 	@property
 	def tokens(self):
 		"""
-		:rtype: list[Token]
+		:rtype: list[GoogleToken]
 		"""
 		if self._tokens is None:
 			self._tokens = [
