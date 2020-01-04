@@ -8,9 +8,9 @@ from .remove_list_duplicates import remove_list_duplicates
 from .join_punctuation import join_punctuation
 from .split_into_sentences import split_into_sentences
 
-from abstract import Graph, NodeStyle
+from abstract import Graph
+from abstract.graph_style import NodeStyle
 import spacy
-import nltk
 
 
 class Token(BasicToken):
@@ -136,7 +136,7 @@ class Document:
 	def get_sentences(self, method='spacy', return_type='Sentence'):
 
 		"""
-		:param str method: can be spacy, nltk, regex
+		:param str method: can be spacy, regex
 		:param str return_type: if method is spacy, return_type can be str or Sentence
 		:rtype: list[str] or list[Sentence]
 		"""
@@ -148,10 +148,10 @@ class Document:
 
 		if sentence_method == 'spacy':
 			self._sentences = [Sentence(obj=x, document=self) for x in self.doc.sents]
-
-		elif sentence_method == 'nltk':
-			self._sentences = nltk.sent_tokenize(text=self.text)
-
+			'''
+			elif sentence_method == 'nltk':
+				self._sentences = nltk.sent_tokenize(text=self.text)
+			'''
 		elif sentence_method == 'regex':
 			self._sentences = split_into_sentences(text=self.text)
 
@@ -209,10 +209,10 @@ class Document:
 		"""
 		:rtype: Graph
 		"""
-		sentence_style = NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+		sentence_style = NodeStyle(text_size=7, shape='rect', shape_style='"rounded, filled"')
 		noun_chunk_style = NodeStyle(
 			fill_colour='lightpink', text_colour='black', text_size=8,
-			shape='rect', style='"rounded, filled"'
+			shape='rect', shape_style='"rounded, filled"'
 		)
 		entity_style = NodeStyle(fill_colour='gold3', text_colour='black')
 		entity_chunk_style = NodeStyle(fill_colour='gold', text_colour='black')
@@ -223,7 +223,7 @@ class Document:
 			if len(self.sentences) > 1:
 				self._entity_graph.add_node(
 					name=str(self.id), label=f'{self.graph_str()}\n({len(self.sentences)} sentences)',
-					style=NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+					style=NodeStyle(text_size=7, shape='rect', shape_style='"rounded, filled"')
 				)
 				for i, sentence in enumerate(self.sentences):
 					self._entity_graph.add_node(
@@ -242,7 +242,7 @@ class Document:
 			for token in self.tokens:
 				self._entity_graph.add_node(
 					name=str(token.id), label=f'{token.graph_str()}',
-					style=NodeStyle(text_size=8, shape='rect', style='"rounded, filled"')
+					style=NodeStyle(text_size=8, shape='rect', shape_style='"rounded, filled"')
 				)
 
 			# add noun_chunks to the graph
@@ -296,7 +296,7 @@ class Document:
 		"""
 		:rtype: Graph
 		"""
-		sentence_style = NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
+		sentence_style = NodeStyle(text_size=7, shape='rect', shape_style='"rounded, filled"')
 		if self._syntax_graph is None:
 			self._syntax_graph = Graph(ordering=False)
 

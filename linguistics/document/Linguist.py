@@ -1,11 +1,11 @@
 import warnings
 import spacy
 from spacy.lang.en import English
-from linguistics.document import Document
+from .Document import Document
 
 
 class Linguist:
-	def __init__(self, spacy_core='en_core_web_sm', prefer_gpu=None):
+	def __init__(self, spacy_core='en_core_web_sm', prefer_gpu=None, wikipedia_api=None):
 		if prefer_gpu is None:
 			self._gpu = spacy.prefer_gpu()
 		elif prefer_gpu:  # explicit True
@@ -16,6 +16,7 @@ class Linguist:
 			self._gpu = False
 
 		self._nlp = spacy.load(spacy_core)
+		self._wikipedia = wikipedia_api
 
 	@property
 	def nlp(self):
@@ -30,3 +31,5 @@ class Linguist:
 
 	def analyze(self, text):
 		return self.create_document(text=text)
+
+

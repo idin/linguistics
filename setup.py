@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-
+import spacy
 # manually make sure en_core_web_sm is installed
 import os
 try:
@@ -22,17 +22,14 @@ def readme():
 
 setup(
 	name='linguistics',
-	version='1.6.2',
+	version='2019.12.29.4',
 	license='MIT',
-
 	url='https://github.com/idin/linguistics',
 	author='Idin',
 	author_email='py@idin.ca',
-
 	description='Python library for natural language processing',
 	long_description=readme(),
 	long_description_content_type='text/markdown',
-
 	classifiers=[
 		'Development Status :: 3 - Alpha',
 		'Intended Audience :: Developers',
@@ -41,9 +38,10 @@ setup(
 		'Programming Language :: Python :: 3.7',
 		'Topic :: Software Development :: Libraries :: Python Modules'
 	],
-
 	packages=find_packages(exclude=["jupyter_tests", ".idea", ".git"]),
-	install_requires=['abstract', 'spacy', 'nltk', 'requests', 'repustate'],
+	install_requires=[
+		'abstract', 'spacy', 'requests', 'jellyfish', 'editdistance', 'chronometry', 'slytherin', 'numpy', 'pandas'
+	],
 	python_requires='~=3.6',
 	zip_safe=False
 )

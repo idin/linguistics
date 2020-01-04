@@ -1,5 +1,5 @@
 from abstract import Graph
-from abstract import NodeStyle
+from abstract.graph_style import NodeStyle
 
 from .GoogleToken import GoogleToken
 from .GoogleEntity import GoogleEntity
