@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import spacy
 # manually make sure en_core_web_sm is installed
 import os
 try:
@@ -13,6 +12,10 @@ try:
 except:
 	os.system('pip install spacy')
 	os.system('python -m spacy download en')
+	try:
+		nlp = spacy.load('en_core_web_sm')
+	except:
+		os.system('python -m spacy download en')
 
 
 def readme():
@@ -22,7 +25,7 @@ def readme():
 
 setup(
 	name='linguistics',
-	version='2019.12.29.4',
+	version='2020.4.6',
 	license='MIT',
 	url='https://github.com/idin/linguistics',
 	author='Idin',
@@ -40,7 +43,9 @@ setup(
 	],
 	packages=find_packages(exclude=["jupyter_tests", ".idea", ".git"]),
 	install_requires=[
-		'abstract', 'spacy', 'requests', 'jellyfish', 'editdistance', 'chronometry', 'slytherin', 'numpy', 'pandas'
+		'abstract', 'spacy', 'requests', 'jellyfish', 'editdistance', 'chronometry',
+		'slytherin', 'numpy', 'pandas',
+		'torch', 'transformers'
 	],
 	python_requires='~=3.6',
 	zip_safe=False
