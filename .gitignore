@@ -2,3 +2,4 @@ build
 linguistics.egg-info
 dist
 *.lucy
+*.lucy
