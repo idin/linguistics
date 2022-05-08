@@ -1,5 +1,4 @@
 from abstract import Graph
-from abstract.graph_style import NodeStyle
 
 from .GoogleToken import GoogleToken
 from .GoogleEntity import GoogleEntity
@@ -140,9 +139,9 @@ class GoogleDocument:
 		"""
 		:rtype: Graph
 		"""
-		sentence_style = NodeStyle(text_size=7, shape='rect', style='"rounded, filled"')
-		entity_style = NodeStyle(fill_colour='gold3', text_colour='black')
-		mention_style = NodeStyle(fill_colour='gold', text_colour='black')
+		sentence_style = {'text_size': 7, 'shape': 'rect', 'style': '"rounded, filled"'}
+		entity_style = {'fill_colour': 'gold3', 'text_colour': 'black'}
+		mention_style = {'fill_colour': 'gold', 'text_colour': 'black'}
 
 		if self._graph is None:
 			self._graph = Graph()
