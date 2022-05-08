@@ -3,3 +3,10 @@ linguistics.egg-info
 dist
 *.lucy
 *.lucy
+.idea
+.ipynb_checkpoints
+linguistics/google/__pycache__
+linguistics/repustate/__pycache__
+linguistics/similarity/__pycache__
+linguistics/__pycache__
+linguistics/document/__pycache__
