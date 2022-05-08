@@ -1,22 +1,15 @@
-
 import re
 from .get_string_similarity import get_string_similarity
 
 
 class Word:
-	def __init__(self, string, similarity_function=None):
+	def __init__(self, string):
 		if string is None: string = ''
-		if type(string) is Word:
+		if isinstance(string, self.__class__):
 			string = string._string
 		else:
 			string = str(string)
 		self._string = re.sub(r'\W+', '', string)
-
-		if similarity_function is None:
-			similarity_function = lambda s1, s2: get_string_similarity(
-				s1=s1, s2=s2, case_sensitivity=0.1, first_char_weight=0.5, method='jaro_winkler'
-			)
-		self._similarity_function = similarity_function
 
 	@property
 	def string(self):
@@ -35,17 +28,16 @@ class Word:
 		:type other: Word
 		:rtype: float
 		"""
+		return self.get_similarity(other=other)
 
-		try:
-			result = self._similarity_function(self.string, str(other))
-		except:
-			print(f'{self}, {other}')
-			raise
-		return result
-
-	def get_similarity(self, other):
-		if other is None: return 0
-		return self._similarity_function(self.string, str(other))
+	def get_similarity(self, other, case_sensitivity=1.0, first_char_weight=0.0, method='jaro_winkler'):
+		if other is None:
+			return 0
+		else:
+			return get_string_similarity(
+				s1=self.string, s2=other.string, method=method,
+				case_sensitivity=case_sensitivity, first_char_weight=first_char_weight
+			)
 
 	def __eq__(self, other):
 		return self.string == str(other)
@@ -54,7 +46,7 @@ class Word:
 		if inplace:
 			self._string = self.string.lower()
 		else:
-			return self.__class__(string=self.string.lower(), similarity_function=self._similarity_function)
+			return self.__class__(string=self.string.lower())
 
 	def __repr__(self):
 		return self._string
