@@ -68,14 +68,15 @@ def get_sentence_similarity(
 	elif not isinstance(words2, list):
 		raise TypeError('words2 should either be a string or a list')
 
-	distance = get_sentence_distance(
-		words1=words1, words2=words2, method=method,
-		case_sensitivity=case_sensitivity, first_char_weight=first_char_weight
-	)
 	if len(words1)==0 and len(words2)==0:
 		return 1.0
 	elif len(words1)==0 or len(words2)==0:
 		return 0.0
+
+	distance = get_sentence_distance(
+		words1=words1, words2=words2, method=method,
+		case_sensitivity=case_sensitivity, first_char_weight=first_char_weight
+	)
 
 	similarity = 1 - distance/max(len(words1), len(words2))
 
@@ -89,4 +90,3 @@ def get_sentence_similarity(
 			case_sensitivity=case_sensitivity, first_char_weight=first_char_weight
 		)
 		return (similarity+first_word_similarity*first_word_weight)/(1+first_word_weight)
-
