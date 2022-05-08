@@ -25,7 +25,7 @@ def readme():
 
 setup(
 	name='linguistics',
-	version='2020.4.6',
+	version='2022.5.8',
 	license='MIT',
 	url='https://github.com/idin/linguistics',
 	author='Idin',
